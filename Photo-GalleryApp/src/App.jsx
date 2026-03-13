@@ -9,6 +9,9 @@ function App() {
 
   return (
     <>
+      <div className="bg-purple-600 text-white p-4 text-center font-bold">
+        Tailwind CSS is working!
+      </div>
       <section id="center">
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />

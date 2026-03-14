@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Documentation and Video Explanations
+answers.md
+answers.pdf
+DEVELOPMENT_STEPS.md
+DEVELOPMENT_STEPS.pdf

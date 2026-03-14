@@ -1,6 +1,22 @@
 import { useState, useEffect } from 'react'
-import heroImg from './assets/hero.png'
 import './App.css'
+
+function LazyImage({ src, alt, className }) {
+  const [loaded, setLoaded] = useState(false)
+  
+  return (
+    <div className="relative w-full h-full overflow-hidden">
+      {!loaded && <div className="absolute inset-0 shimmer-placeholder" />}
+      <img
+        src={src}
+        alt={alt}
+        className={`${className} transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        onLoad={() => setLoaded(true)}
+        loading="lazy"
+      />
+    </div>
+  )
+}
 
 function App() {
   const [photos, setPhotos] = useState([])
@@ -60,12 +76,11 @@ function App() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {photos.map((photo) => (
               <div key={photo.id} className="bg-white overflow-hidden flex flex-col group">
-                <div className="aspect-square overflow-hidden bg-gray-200 relative">
-                   <img 
+                <div className="aspect-square overflow-hidden bg-gray-100 relative">
+                   <LazyImage 
                     src={photo.download_url} 
                     alt={`Photo by ${photo.author}`}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>

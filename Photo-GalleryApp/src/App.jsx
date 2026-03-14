@@ -1,27 +1,12 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
-function LazyImage({ src, alt, className }) {
-  const [loaded, setLoaded] = useState(false)
-  
-  return (
-    <div className="relative w-full h-full overflow-hidden">
-      {!loaded && <div className="absolute inset-0 shimmer-placeholder" />}
-      <img
-        src={src}
-        alt={alt}
-        className={`${className} transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-        onLoad={() => setLoaded(true)}
-        loading="lazy"
-      />
-    </div>
-  )
-}
-
 function App() {
   const [photos, setPhotos] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [likedPhotos, setLikedPhotos] = useState([])
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -42,11 +27,33 @@ function App() {
     fetchPhotos()
   }, [])
 
+  const toggleLike = (id) => {
+    if (likedPhotos.includes(id)) {
+      setLikedPhotos(likedPhotos.filter(photoId => photoId !== id))
+    } else {
+      setLikedPhotos([...likedPhotos, id])
+    }
+  }
+
+  const filteredPhotos = photos.filter(photo => 
+    photo.author.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <header className="p-6">
-        <div className="max-w-6xl mx-auto flex justify-center items-center">
-          <h1 className="text-3xl font-bold tracking-tight m-0 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text !text-transparent">Photo Gallery</h1>
+        <div className="max-w-6xl mx-auto flex flex-col items-center gap-6">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text !text-transparent">Photo Gallery</h1>
+          
+          <div className="w-full max-w-md">
+            <input
+              type="text"
+              placeholder="Search by author name..."
+              className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-gray-700"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </header>
 
@@ -74,28 +81,35 @@ function App() {
 
         {!loading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {photos.map((photo) => (
+            {filteredPhotos.map((photo) => (
               <div key={photo.id} className="bg-white overflow-hidden flex flex-col group">
                 <div className="aspect-square overflow-hidden bg-gray-100 relative">
-                   <LazyImage 
+                  <img 
                     src={photo.download_url} 
                     alt={`Photo by ${photo.author}`}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
                 <div className="p-4 flex flex-col flex-grow">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-gray-900 font-semibold truncate mr-2">{photo.author}</h3>
-                    <button className="text-gray-400 hover:text-red-500 transition-colors duration-200 focus:outline-none" aria-label="Like photo">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
+                    <button 
+                      onClick={() => toggleLike(photo.id)}
+                      className="text-xl transition-transform active:scale-90 hover:scale-110 focus:outline-none"
+                    >
+                      {likedPhotos.includes(photo.id) ? '❤️' : '🤍'}
                     </button>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        
+        {!loading && !error && filteredPhotos.length === 0 && (
+          <div className="text-center py-20">
+            <p className="text-gray-500 text-lg">No photos found for "{searchTerm}"</p>
           </div>
         )}
       </main>

@@ -1,12 +1,37 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useReducer } from 'react'
 import './App.css'
+
+const FAVOURITES_KEY = 'photo_gallery_favourites'
+
+const favouritesReducer = (state, action) => {
+  switch (action.type) {
+    case 'TOGGLE_FAVOURITE':
+      if (state.includes(action.id)) {
+        return state.filter(id => id !== action.id)
+      } else {
+        return [...state, action.id]
+      }
+    case 'SET_FAVOURITES':
+      return action.payload
+    default:
+      return state
+  }
+}
 
 function App() {
   const [photos, setPhotos] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [likedPhotos, setLikedPhotos] = useState([])
+  
+  const [likedPhotos, dispatch] = useReducer(favouritesReducer, [], () => {
+    const saved = localStorage.getItem(FAVOURITES_KEY)
+    return saved ? JSON.parse(saved) : []
+  })
+
+  useEffect(() => {
+    localStorage.setItem(FAVOURITES_KEY, JSON.stringify(likedPhotos))
+  }, [likedPhotos])
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -28,11 +53,7 @@ function App() {
   }, [])
 
   const toggleLike = (id) => {
-    if (likedPhotos.includes(id)) {
-      setLikedPhotos(likedPhotos.filter(photoId => photoId !== id))
-    } else {
-      setLikedPhotos([...likedPhotos, id])
-    }
+    dispatch({ type: 'TOGGLE_FAVOURITE', id })
   }
 
   const filteredPhotos = photos.filter(photo => 

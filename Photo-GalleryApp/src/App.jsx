@@ -73,7 +73,7 @@ function App() {
         )}
 
         {!loading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {photos.map((photo) => (
               <div key={photo.id} className="bg-white overflow-hidden flex flex-col group">
                 <div className="aspect-square overflow-hidden bg-gray-100 relative">
@@ -85,9 +85,13 @@ function App() {
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
                 <div className="p-4 flex flex-col flex-grow">
-                  <h3 className="text-gray-900 font-semibold truncate mb-2">{photo.author}</h3>
-                  <div className="mt-auto flex justify-between items-center text-xs text-gray-500">
-                    <span>{photo.width} × {photo.height}</span>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-gray-900 font-semibold truncate mr-2">{photo.author}</h3>
+                    <button className="text-gray-400 hover:text-red-500 transition-colors duration-200 focus:outline-none" aria-label="Like photo">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -95,10 +99,6 @@ function App() {
           </div>
         )}
       </main>
-
-      <footer className="bg-white p-6 text-center text-sm text-gray-500">
-        <p>© 2026 Photo Gallery App. Built with React + Vite + Tailwind CSS</p>
-      </footer>
     </div>
   )
 }
